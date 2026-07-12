@@ -38,7 +38,7 @@ accepted as token variable names.
 
 | Tool | Description | Parameters | Annotations |
 |------|-------------|------------|-------------|
-| `wikijs_get_page` | Retrieve full page content and metadata | `id?` Page ID, `path?` Page path, `locale="en"` Page locale | `readOnlyHint: true` |
+| `wikijs_get_page` | Retrieve full page content and metadata | `id?` Canonical page ID (locale not needed), `path?` Page path, `locale?` Required only with path | `readOnlyHint: true` |
 | `wikijs_list_pages` | List pages with pagination and filtering | `locale?` Filter by locale, `path?` Only include pages under this path, `limit=50` Max pages to return, `offset=0` Skip N pages | `readOnlyHint: true` |
 | `wikijs_get_tree` | Retrieve the hierarchical Wiki.js page tree | `parent_path?` Parent path, `parent_id?` Parent tree node ID, `mode="ALL"` ALL/FOLDERS/PAGES, `locale="en"` Page locale, `includeAncestors=false` Include ancestor nodes | `readOnlyHint: true` |
 | `wikijs_search_pages` | Full-text search across wiki pages | `query` Search query, `locale?` Filter results by locale, `path?` Only include pages under this path | `readOnlyHint: true` |

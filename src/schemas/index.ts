@@ -8,11 +8,12 @@ import { z } from 'zod';
 import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from '../constants.js';
 
 // Common schemas
-const localeSchema = z
+const localeCodeSchema = z
   .string()
   .regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'Locale must be a valid language code (e.g., "en", "de", "en-US")')
-  .default('en')
   .describe('Page locale (e.g., "en", "de")');
+
+const localeSchema = localeCodeSchema.default('en');
 
 const pageIdSchema = z
   .number()
@@ -50,9 +51,9 @@ const pathFilterSchema = z
 
 // Get Page Schema
 export const getPageSchema = z.object({
-  id: pageIdSchema.optional().describe('Page ID (optional if path is provided)'),
-  path: pagePathSchema.optional().describe('Page path (optional if id is provided)'),
-  locale: localeSchema,
+  id: pageIdSchema.optional().describe('Canonical page ID. When provided, path and locale are ignored.'),
+  path: pagePathSchema.optional().describe('Page path. Used only when id is omitted.'),
+  locale: localeCodeSchema.optional().describe('Page locale. Required only for a path lookup; ignored for an ID lookup.'),
 });
 
 export type GetPageInput = z.infer<typeof getPageSchema>;
