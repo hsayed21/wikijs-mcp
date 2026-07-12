@@ -28,6 +28,8 @@ import {
   handleSearchPages,
 } from './tools/index.js';
 
+const SERVER_VERSION = '2.0.1';
+
 // Load environment variables from deployment directory
 const envPath = join(homedir(), '.claude', 'mcp-servers', 'wikijs', '.env');
 if (existsSync(envPath)) {
@@ -39,7 +41,8 @@ if (existsSync(envPath)) {
 
 // Validate required environment variables
 const WIKIJS_API_URL = process.env.WIKIJS_API_URL;
-const WIKIJS_API_TOKEN = process.env.WIKIJS_API_TOKEN;
+const WIKIJS_API_TOKEN =
+  process.env.WIKIJS_API_TOKEN ?? process.env.WIKIJS_TOKEN ?? process.env.WIKIJS_API_KEY;
 
 if (!WIKIJS_API_URL || !WIKIJS_API_TOKEN) {
   console.error('Error: Missing required environment variables');
@@ -53,7 +56,7 @@ const wikiClient = new WikiJsClient(WIKIJS_API_URL, WIKIJS_API_TOKEN);
 // Create MCP server with modern API
 const server = new McpServer({
   name: 'wikijs-mcp-server',
-  version: '2.0.0',
+  version: SERVER_VERSION,
 });
 
 // Register tools using modern registerTool API
@@ -123,7 +126,7 @@ async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   const host = new URL(WIKIJS_API_URL!).hostname;
-  console.error('Wiki.js MCP Server v2.0.0 running on stdio');
+  console.error(`Wiki.js MCP Server v${SERVER_VERSION} running on stdio`);
   console.error(`Connected to: ${host}`);
 }
 

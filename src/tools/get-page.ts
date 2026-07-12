@@ -13,11 +13,11 @@ export const getPageToolDefinition = {
   name: 'wikijs_get_page',
   description: `Get a page from Wiki.js by ID or path. Returns full page content and metadata.
 
-This tool retrieves a single page with all its content. You can identify the page either by its numeric ID or by its path + locale combination.
+This tool retrieves a single page with all its content. Prefer the exact path + locale returned by wikijs_search_pages. You can also use the canonical numeric ID returned by that tool.
 
 Args:
-  - id (number, optional): Page ID (use this OR path)
-  - path (string, optional): Page path (use this OR id)
+  - id (number, optional): Canonical Page ID from wikijs_search_pages (use this OR path)
+  - path (string, optional): Exact page path from wikijs_search_pages (preferred)
   - locale (string): Page locale, default "en" (required when using path)
 
 Returns:
@@ -53,12 +53,11 @@ export async function handleGetPage(
       throw new Error('Either "id" or "path" must be provided');
     }
 
-    let page;
-    if (validated.id) {
-      page = await client.getPageById(validated.id);
-    } else if (validated.path) {
-      page = await client.getPageByPath(validated.path, validated.locale);
-    }
+    // Prefer the path when both values are supplied. Wiki.js paths are stable,
+    // while IDs from older search responses may refer to a search index record.
+    const page = validated.path
+      ? await client.getPageByPath(validated.path, validated.locale)
+      : await client.getPageById(validated.id!);
 
     if (!page) {
       throw new Error(`Page not found${validated.path ? ` at path: ${validated.path}` : ` with ID: ${validated.id}`}`);

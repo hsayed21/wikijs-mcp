@@ -9,6 +9,8 @@ import type {
   WikiPage,
   WikiPageListItem,
   SearchResponse,
+  SearchResult,
+  WikiSearchResponse,
   WikiPageTreeNode,
 } from '../types.js';
 
@@ -32,12 +34,23 @@ function compareValues(left: string | number | undefined, right: string | number
   }) * multiplier;
 }
 
+type WikiPageIdentity = Pick<WikiPageListItem, 'id' | 'path' | 'locale' | 'isPublished'>;
+
+function pageKey(locale: string, path: string): string {
+  return `${locale}:${path}`;
+}
+
+function graphqlEndpoint(apiUrl: string): string {
+  const baseUrl = apiUrl.replace(/\/+$/, '');
+  return baseUrl.endsWith('/graphql') ? baseUrl : `${baseUrl}/graphql`;
+}
+
 export class WikiJsClient {
   private apiUrl: string;
   private apiToken: string;
 
   constructor(apiUrl: string, apiToken: string) {
-    this.apiUrl = apiUrl;
+    this.apiUrl = graphqlEndpoint(apiUrl);
     this.apiToken = apiToken;
   }
 
@@ -234,20 +247,42 @@ export class WikiJsClient {
             suggestions
             totalHits
           }
+          list {
+            id
+            path
+            locale
+            isPublished
+          }
         }
       }
     `;
 
-    const data = await this.query<{ pages: { search: SearchResponse } }>(query, { query: searchQuery });
-    const results = data.pages.search;
+    const data = await this.query<{
+      pages: { search: WikiSearchResponse; list: WikiPageIdentity[] };
+    }>(query, { query: searchQuery });
 
-    const { pages: activePages } = await this.listPages(locale, -1, 0, path);
-    const activePageKeys = new Set(activePages.map((p) => `${p.locale}:${p.path}`));
-    results.results = results.results.filter((r) => activePageKeys.has(`${r.locale}:${r.path}`));
-    results.results = results.results.sort((left, right) => compareValues(left.title, right.title, 'ASC'));
-    results.totalHits = results.results.length;
+    // Wiki.js search result IDs belong to the search index and are not safe to
+    // pass to pages.single. Resolve every result to the canonical page ID from
+    // pages.list using the stable locale + path identity.
+    const activePages = data.pages.list.filter((page) =>
+      page.isPublished &&
+      (!locale || page.locale === locale) &&
+      (!path || page.path.startsWith(path))
+    );
+    const pagesByKey = new Map(activePages.map((page) => [pageKey(page.locale, page.path), page]));
+    const results = data.pages.search.results
+      .map((result): SearchResult | null => {
+        const page = pagesByKey.get(pageKey(result.locale, result.path));
+        return page ? { ...result, id: page.id } : null;
+      })
+      .filter((result): result is SearchResult => result !== null)
+      .sort((left, right) => compareValues(left.title, right.title, 'ASC'));
 
-    return results;
+    return {
+      results,
+      suggestions: data.pages.search.suggestions,
+      totalHits: results.length,
+    };
   }
 
   /**

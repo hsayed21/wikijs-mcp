@@ -23,6 +23,11 @@ npm install -g @hsayed21/wikijs-mcp
 # 2. Configure your MCP client with WIKIJS_API_URL and WIKIJS_API_TOKEN
 ```
 
+`WIKIJS_API_URL` can be either the Wiki.js base URL (for example,
+`https://wiki.example.com`) or the full `/graphql` endpoint. For compatibility
+with existing Wiki.js deployments, `WIKIJS_TOKEN` and `WIKIJS_API_KEY` are also
+accepted as token variable names.
+
 ## Requirements
 
 - **Node.js 18+**

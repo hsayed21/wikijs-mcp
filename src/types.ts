@@ -38,6 +38,14 @@ export interface SearchResult {
   locale: string;
 }
 
+export interface WikiSearchResult extends Omit<SearchResult, 'id'> {
+  id: string | number;
+}
+
+export interface WikiSearchResponse extends Omit<SearchResponse, 'results'> {
+  results: WikiSearchResult[];
+}
+
 export interface SearchResponse {
   results: SearchResult[];
   suggestions: string[];

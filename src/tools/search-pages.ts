@@ -23,7 +23,10 @@ Args:
 Returns:
   - totalHits: Total number of matching published pages
   - suggestions: Search suggestions for refinement
-  - results: Array of matching pages (id, title, path, description, locale)
+  - results: Array of matching pages (canonical page id, title, path, description, locale)
+
+The returned id is resolved from Wiki.js pages.list and is safe to pass to wikijs_get_page.
+For the most stable lookup, pass the returned path and locale to wikijs_get_page.
 
 Examples:
   - Search for topic: query="osTicket API"
