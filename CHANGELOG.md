@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v2.0.3](https://github.com/hsayed21/wikijs-mcp/compare/v2.0.2...v2.0.3)
+
+> 12 July 2026
+
+- 🔨 chore: update README and improve tool descriptions for clarity [`2ced68d`](https://github.com/hsayed21/wikijs-mcp/commit/2ced68d74e190cd345b9b1d20036c43e0237c9b1)
+
 #### v2.0.2
 
 > 12 July 2026
