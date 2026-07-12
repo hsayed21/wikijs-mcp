@@ -1,4 +1,3 @@
-# Dependencies
 node_modules/
 
 # Build output
@@ -33,3 +32,4 @@ Thumbs.db
 
 # Claude Code project instructions
 CLAUDE.md
+tests/

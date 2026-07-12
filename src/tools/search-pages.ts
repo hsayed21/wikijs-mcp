@@ -26,7 +26,7 @@ Returns:
   - results: Array of matching pages (canonical page id, title, path, description, locale)
 
 The returned id is resolved from Wiki.js pages.list and is safe to pass to wikijs_get_page.
-For the most stable lookup, pass the returned path and locale to wikijs_get_page.
+Pass that canonical id by itself to wikijs_get_page to retrieve the exact page; locale is not required.
 
 Examples:
   - Search for topic: query="osTicket API"

@@ -13,12 +13,12 @@ export const getPageToolDefinition = {
   name: 'wikijs_get_page',
   description: `Get a page from Wiki.js by ID or path. Returns full page content and metadata.
 
-This tool retrieves a single page with all its content. Prefer the exact path + locale returned by wikijs_search_pages. You can also use the canonical numeric ID returned by that tool.
+This tool retrieves a single page with all its content. Prefer the canonical numeric ID returned by wikijs_search_pages because it uniquely identifies the exact page and does not require a locale.
 
 Args:
-  - id (number, optional): Canonical Page ID from wikijs_search_pages (use this OR path)
-  - path (string, optional): Exact page path from wikijs_search_pages (preferred)
-  - locale (string): Page locale, default "en" (required when using path)
+  - id (number, optional): Canonical Page ID from wikijs_search_pages. Locale is not needed.
+  - path (string, optional): Exact page path, used only when id is omitted.
+  - locale (string, optional): Required with path; ignored when id is provided.
 
 Returns:
   Full page data including:
@@ -53,14 +53,16 @@ export async function handleGetPage(
       throw new Error('Either "id" or "path" must be provided');
     }
 
-    // Prefer the path when both values are supplied. Wiki.js paths are stable,
-    // while IDs from older search responses may refer to a search index record.
-    const page = validated.path
-      ? await client.getPageByPath(validated.path, validated.locale)
-      : await client.getPageById(validated.id!);
+    if (!validated.id && !validated.locale) {
+      throw new Error('Locale is required when retrieving a page by path');
+    }
+
+    const page = validated.id
+      ? await client.getPageById(validated.id)
+      : await client.getPageByPath(validated.path!, validated.locale!);
 
     if (!page) {
-      throw new Error(`Page not found${validated.path ? ` at path: ${validated.path}` : ` with ID: ${validated.id}`}`);
+      throw new Error(`Page not found${validated.id ? ` with ID: ${validated.id}` : ` at path: ${validated.path}`}`);
     }
 
     return successResponse({

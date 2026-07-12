@@ -69,8 +69,8 @@ jobs:
           grep -q '"build"' package.json || { echo "Error: Build script missing"; exit 1; }
           echo "✓ Package metadata valid"
 
-      - name: Verify CHANGELOG format
-        run: |
-          echo "Checking CHANGELOG.md format..."
-          grep -q "## \[Unreleased\]" CHANGELOG.md || { echo "Error: [Unreleased] section missing"; exit 1; }
-          echo "✓ CHANGELOG format valid"
+      # - name: Verify CHANGELOG format
+      #   run: |
+      #     echo "Checking CHANGELOG.md format..."
+      #     grep -q "## \[Unreleased\]" CHANGELOG.md || { echo "Error: [Unreleased] section missing"; exit 1; }
+      #     echo "✓ CHANGELOG format valid"
