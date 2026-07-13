@@ -1,9 +1,9 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
+  #push:
+  #  branches:
+  #    - main
   workflow_dispatch:
     inputs:
       version:
@@ -15,7 +15,11 @@ on:
           - patch
           - minor
           - major
-
+      update_latest:
+        description: Update the latest release instead of creating a new one
+        required: true
+        default: true
+        type: boolean
 permissions:
   contents: write
   pull-requests: write
@@ -56,6 +60,7 @@ jobs:
           version: ${{ github.event_name == 'workflow_dispatch' && inputs.version || 'patch' }}
           initial-version: '2.0.1'
           generate-changelog: true
+          update-latest-release: ${{ inputs.update_latest }}
           node-version: '22'
           release-command-shell: bash
           release-command: |
